@@ -1,0 +1,24 @@
+<idea-plugin>
+    <id>com.medcompany.ai-code-review-gate</id>
+    <name>AI Code Review Gate</name>
+    <vendor>MedCompany</vendor>
+
+    <description><![CDATA[
+        AI Code Review Gate reviews the selected changes with DeepSeek before IntelliJ IDEA creates a Git commit.
+        发现高风险问题时取消提交并展示结构化报告；API Key 由每位开发者配置并保存在 Password Safe。
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.vcs</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.medcompany.aireview.settings.AiReviewSettings"/>
+        <applicationConfigurable
+                id="com.medcompany.aireview.settings"
+                parentId="tools"
+                displayName="AI Code Review"
+                instance="com.medcompany.aireview.settings.AiReviewConfigurable"/>
+        <checkinHandlerFactory implementation="com.medcompany.aireview.commit.AiReviewCheckinHandlerFactory"/>
+        <notificationGroup id="AI Code Review" displayType="BALLOON"/>
+    </extensions>
+</idea-plugin>

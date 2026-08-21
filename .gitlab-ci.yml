@@ -1,0 +1,29 @@
+stages:
+  - test
+  - package
+
+variables:
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+
+cache:
+  key: "gradle-intellij-2024.1"
+  paths:
+    - .gradle/caches/
+    - .gradle/wrapper/
+    - .intellijPlatform/
+
+test_plugin:
+  stage: test
+  image: gradle:9.7.1-jdk21
+  script:
+    - ./gradlew --no-daemon test
+
+build_plugin:
+  stage: package
+  image: gradle:9.7.1-jdk21
+  script:
+    - ./gradlew --no-daemon buildPlugin
+  artifacts:
+    expire_in: 90 days
+    paths:
+      - build/distributions/*.zip
