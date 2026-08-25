@@ -1,5 +1,6 @@
 package com.medcompany.aireview.commit
 
+import com.medcompany.aireview.model.CommitPatch
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -32,5 +33,35 @@ class AiReviewCommitProblemTest {
                 "已复核",
             ),
         )
+    }
+
+    @Test
+    fun `marks a commit reviewed without code changes`() {
+        assertEquals(
+            "fix: inspect transfer state\n\nAI-Review: reviewed-no-change",
+            appendReviewedWithoutChangesTrailer("fix: inspect transfer state"),
+        )
+    }
+
+    @Test
+    fun `replaces a previous override when accepting an unchanged report`() {
+        assertEquals(
+            "fix: inspect transfer state\n\nAI-Review: reviewed-no-change",
+            appendReviewedWithoutChangesTrailer(
+                "fix: inspect transfer state\n\nAI-Review: overridden\nAI-Review-Reason: old reason",
+            ),
+        )
+    }
+
+    @Test
+    fun `report bypass only applies to an unchanged diff before expiry`() {
+        val original = CommitPatch("diff --git a/A.java b/A.java\n+first", listOf("A.java"), 45)
+        val changed = CommitPatch("diff --git a/A.java b/A.java\n+second", listOf("A.java"), 46)
+        val fingerprint = patchFingerprint(original)
+        val bypass = ManualFixBypass(fingerprint, expiresAtMillis = 1_000)
+
+        kotlin.test.assertTrue(bypass.appliesTo(patchFingerprint(original), 999))
+        kotlin.test.assertFalse(bypass.appliesTo(patchFingerprint(changed), 999))
+        kotlin.test.assertFalse(bypass.appliesTo(fingerprint, 1_001))
     }
 }

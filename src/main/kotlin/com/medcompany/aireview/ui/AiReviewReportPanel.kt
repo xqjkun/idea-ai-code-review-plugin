@@ -39,6 +39,7 @@ class AiReviewReportPanel(
     private val report: ReviewReport,
     private val config: AiReviewConfig,
     private val beforeNavigate: () -> Unit = {},
+    private val navigationLabel: String = "打开并定位代码",
 ) : JBScrollPane() {
     init {
         horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
@@ -112,7 +113,7 @@ class AiReviewReportPanel(
 
         add(markdownText("[${finding.severity}] ${finding.title}", bold = true))
         add(wrappedText("位置：${finding.file}:${finding.line}"), top = 4)
-        add(ActionLink("打开并定位代码 · ${displayFileName(finding.file)}:${finding.line}") {
+        add(ActionLink("$navigationLabel · ${displayFileName(finding.file)}:${finding.line}") {
             openFinding(finding)
         }.apply {
             toolTipText = "${finding.file}:${finding.line}"

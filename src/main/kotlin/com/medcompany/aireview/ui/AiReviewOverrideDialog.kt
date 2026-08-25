@@ -17,6 +17,7 @@ class AiReviewOverrideDialog(
     private val project: Project,
     private val report: ReviewReport,
     private val config: AiReviewConfig,
+    private val onEditRequested: () -> Unit,
 ) : DialogWrapper(project) {
     private val reasonField = JBTextArea(3, 72).apply {
         lineWrap = true
@@ -37,11 +38,19 @@ class AiReviewOverrideDialog(
 
     override fun createCenterPanel(): JComponent {
         return FormBuilder.createFormBuilder()
-            .addComponent(JBLabel("AI 仅提供辅助意见。强制提交只对本次操作生效，下一次提交仍会重新审核。"))
+            .addComponent(JBLabel("可保留报告查看代码；代码未变化时下次 Commit 直接继续，发生修改则重新 AI 审核。"))
             .addComponent(
-                AiReviewReportPanel(project, report, config) {
-                    close(CANCEL_EXIT_CODE)
-                }.apply { preferredSize = Dimension(820, 380) },
+                AiReviewReportPanel(
+                    project = project,
+                    report = report,
+                    config = config,
+                    beforeNavigate = {
+                        onEditRequested()
+                        close(CANCEL_EXIT_CODE)
+                        AiReviewReportDialog(project, report, config).show()
+                    },
+                    navigationLabel = "查看代码并保留报告",
+                ).apply { preferredSize = Dimension(820, 380) },
             )
             .addLabeledComponent(JBLabel("强制提交原因："), JBScrollPane(reasonField), 1, true)
             .addComponent(JBLabel("确认后原因会以 AI-Review Trailer 写入 Git 提交信息，并在 GitLab 中可见。"))

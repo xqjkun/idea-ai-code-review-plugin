@@ -18,7 +18,8 @@
 - `CRITICAL/HIGH` 默认拦截；可选择让 `MEDIUM` 也拦截。
 - AI 定位为辅助工具：查看报告、填写原因并确认已人工复核后，可仅对本次操作强制提交。
 - 强制提交会把 `AI-Review: overridden` 和 `AI-Review-Reason: ...` 作为 Git Trailer 追加到本次 Commit Message，GitLab 可查看和检索。
-- 审核发现按问题卡片展示，点击“打开并定位代码”会关闭审核弹窗、打开对应文件、移动光标到报告行并获得编辑器焦点。
+- 审核发现按问题卡片展示，点击“打开并定位代码”会打开对应文件、移动光标到报告行并获得编辑器焦点；非模态报告窗口会继续保留。
+- AI 阻断后可选择“查看代码并保留报告”：报告以非模态窗口留在旁边；Diff 未变化时再次 Commit 可直接继续，任何代码变化都会让旧报告失效并重新调用 DeepSeek。
 - 摘要、问题说明、修复建议和测试建议支持安全的 Markdown 富文本显示，包括标题、列表、粗体、斜体、行内代码和代码块。
 - API 超时、Key 无效、响应格式错误时采用 fail-closed：取消提交。
 - DeepSeek 返回余额不足时会明确警告“本次代码未经过 AI 审核”，但自动放行本次提交；充值后后续提交会自动恢复审核。
@@ -30,7 +31,7 @@
 构建产物位于：
 
 ```text
-build/distributions/idea-ai-code-review-plugin-0.4.2.zip
+build/distributions/idea-ai-code-review-plugin-0.5.1.zip
 ```
 
 在 IDEA 中打开：

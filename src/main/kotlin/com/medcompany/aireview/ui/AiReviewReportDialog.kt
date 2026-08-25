@@ -13,15 +13,14 @@ class AiReviewReportDialog(
     private val config: AiReviewConfig,
 ) : DialogWrapper(project) {
     init {
+        isModal = false
         title = "AI 代码审核报告"
         setOKButtonText("关闭")
         init()
     }
 
     override fun createCenterPanel(): JComponent =
-        AiReviewReportPanel(project, report, config) {
-            close(OK_EXIT_CODE)
-        }.apply { preferredSize = Dimension(820, 580) }
+        AiReviewReportPanel(project, report, config).apply { preferredSize = Dimension(820, 580) }
 
     override fun createActions() = arrayOf(okAction)
 }

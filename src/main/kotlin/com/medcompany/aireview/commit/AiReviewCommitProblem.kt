@@ -14,6 +14,7 @@ class AiReviewCommitProblem(
     private val report: ReviewReport,
     private val config: AiReviewConfig,
     private val onOverrideAccepted: (String) -> Unit,
+    private val onEditRequested: () -> Unit,
 ) : CommitProblemWithDetails {
     override val text: String = report.error?.let { "AI 审核失败：$it" }
         ?: "AI 审核发现 ${report.blockingFindings(config).size} 个阻断问题，提交已取消"
@@ -21,11 +22,12 @@ class AiReviewCommitProblem(
     override val showDetailsAction: String = "查看 AI 审核报告"
 
     override fun showDetails(project: Project) {
+        onEditRequested()
         AiReviewReportDialog(project, report, config).show()
     }
 
     override fun showModalSolution(project: Project, commitInfo: CommitInfo): CheckinHandler.ReturnResult {
-        val dialog = AiReviewOverrideDialog(project, report, config)
+        val dialog = AiReviewOverrideDialog(project, report, config, onEditRequested)
         if (!dialog.showAndGet()) return CheckinHandler.ReturnResult.CANCEL
 
         onOverrideAccepted(dialog.reason)
@@ -50,14 +52,8 @@ internal fun appendOverrideTrailers(commitMessage: String, reason: String): Stri
     val normalizedReason = reason.trim()
         .replace(Regex("\\s+"), " ")
         .take(500)
-    val retainedLines = commitMessage.lineSequence()
-        .filterNot { line ->
-            line.startsWith("AI-Review:", ignoreCase = true) ||
-                line.startsWith("AI-Review-Reason:", ignoreCase = true)
-        }
-        .toList()
-        .dropLastWhile(String::isBlank)
-    val base = retainedLines.joinToString("\n")
+    val base = removeAiReviewTrailers(commitMessage)
+    val retainedLines = base.lines()
     val trailer = "AI-Review: overridden\nAI-Review-Reason: $normalizedReason"
     if (base.isBlank()) return trailer
 
@@ -66,3 +62,19 @@ internal fun appendOverrideTrailers(commitMessage: String, reason: String): Stri
         retainedLines.drop(lastBlankLine + 1).all { it.matches(Regex("[A-Za-z0-9-]+: .+")) }
     return base + if (continuesExistingTrailerBlock) "\n$trailer" else "\n\n$trailer"
 }
+
+internal fun appendReviewedWithoutChangesTrailer(commitMessage: String): String {
+    val base = removeAiReviewTrailers(commitMessage)
+    val trailer = "AI-Review: reviewed-no-change"
+    return if (base.isBlank()) trailer else "$base\n\n$trailer"
+}
+
+internal fun removeAiReviewTrailers(commitMessage: String): String =
+    commitMessage.lineSequence()
+        .filterNot { line ->
+            line.startsWith("AI-Review:", ignoreCase = true) ||
+                line.startsWith("AI-Review-Reason:", ignoreCase = true)
+        }
+        .toList()
+        .dropLastWhile(String::isBlank)
+        .joinToString("\n")
