@@ -80,6 +80,19 @@ export JAVA_HOME='/Applications/IntelliJ IDEA.app/Contents/jbr/Contents/Home'
 
 如果开发时显式传入 `-PideaHome=...`，会改用本机 IDEA SDK；发布前请务必再不带该参数完整构建，避免无意中使用高版本 API。
 
+## 自动发布
+
+推送与 `build.gradle.kts` 版本一致的 `v*` Tag 后，GitHub Actions 会自动测试、构建、验证兼容性并创建 GitHub Release。完成 JetBrains Marketplace 的第一次手工上传后，在 GitHub Actions Secrets 配置以下四项，后续版本还会自动签名并上传到 Marketplace：
+
+```text
+PUBLISH_TOKEN
+CERTIFICATE_CHAIN
+PRIVATE_KEY
+PRIVATE_KEY_PASSWORD
+```
+
+密钥只保存在 GitHub Secrets，不得写入项目文件或提交到 Git。Marketplace 尚未配置完整时，工作流会明确提示并跳过 Marketplace 上传，但仍会正常生成 GitHub Release。
+
 ## 管理边界
 
 IDEA 插件能够改善提交前体验，但开发者可以禁用插件、使用命令行提交或卸载插件，因此它不能单独形成不可绕过的团队门禁。建议继续保留 GitLab Merge Request Pipeline 的 AI 审核 Job，并启用 `Pipelines must succeed`；IDEA 插件负责及时反馈，GitLab 负责最终约束和审计。
