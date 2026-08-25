@@ -31,7 +31,7 @@
 构建产物位于：
 
 ```text
-build/distributions/idea-ai-code-review-plugin-0.5.2.zip
+build/distributions/idea-ai-code-review-plugin-0.5.3.zip
 ```
 
 在 IDEA 中打开：

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.medcompany"
-version = "0.5.2"
+version = "0.5.3"
 
 val ideaHome = providers.gradleProperty("ideaHome")
 
