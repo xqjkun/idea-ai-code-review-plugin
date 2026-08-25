@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Test, build and release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Check tag matches project version
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          project_version="$(sed -n 's/^version = "\(.*\)"$/\1/p' build.gradle.kts)"
+          if [ -z "$project_version" ] || [ "$tag_version" != "$project_version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match project version ${project_version:-<not found>}. Update version in build.gradle.kts first."
+            exit 1
+          fi
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Test
+        run: ./gradlew --no-daemon test
+
+      - name: Build plugin
+        run: ./gradlew --no-daemon buildPlugin
+
+      - name: Verify plugin against supported IDEA versions
+        run: ./gradlew --no-daemon verifyPlugin
+
+      - name: Create GitHub Release and upload plugin zip
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" build/distributions/*.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" build/distributions/*.zip \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$GITHUB_REF_NAME" \
+              --generate-notes
+          fi
