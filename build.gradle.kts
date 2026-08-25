@@ -65,7 +65,8 @@ intellijPlatform {
         }
 
         vendor {
-            name = "MedCompany"
+            name = "suixq"
+            email = "304589624@qq.com"
         }
     }
 

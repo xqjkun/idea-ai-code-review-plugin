@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.medcompany.ai-code-review-gate</id>
     <name>AI Code Review Gate</name>
-    <vendor>MedCompany</vendor>
+    <vendor email="304589624@qq.com">suixq</vendor>
 
     <description><![CDATA[
         AI Code Review Gate reviews the selected changes with DeepSeek before IntelliJ IDEA creates a Git commit.

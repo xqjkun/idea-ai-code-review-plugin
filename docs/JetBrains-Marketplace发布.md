@@ -4,7 +4,7 @@
 
 JetBrains 要求插件第一次发布由作者在 Marketplace 页面手工完成：
 
-1. 登录 JetBrains Marketplace，接受开发者协议并创建 Vendor Profile。
+1. 登录 JetBrains Marketplace，接受开发者协议并创建名为 `suixq` 的 Vendor Profile，联系邮箱使用 `304589624@qq.com`。
 2. 上传 GitHub Release 中的插件 ZIP。
 3. 插件 XML ID 使用 `com.medcompany.ai-code-review-gate`。
 4. 许可证选择 Apache License 2.0，源码地址填写 `https://github.com/xqjkun/idea-ai-code-review-plugin`。

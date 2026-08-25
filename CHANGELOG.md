@@ -6,6 +6,7 @@
 
 - GitHub Tag 发布流程增加 JetBrains Marketplace 自动签名和上传；缺少 Marketplace Secret 时安全跳过，不影响 GitHub Release。
 - GitHub Actions 升级到 Node.js 24 兼容版本，并停止保存超过 GitHub 10 GB 限制的 IDEA 验证缓存。
+- Marketplace Vendor 信息更新为 `suixq`，联系邮箱为 `304589624@qq.com`。
 
 ## 0.5.2（2026-08-25）
 
